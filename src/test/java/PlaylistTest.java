@@ -52,7 +52,7 @@ public class PlaylistTest {
         String expected = "Test Playlist (1 songs)";
         assertEquals(expected, playlist.toString());
         playlist.setShuffle(true);
-        expected = "Test Playlist (1 songs, shuffled)";
+        expected = "Test Playlist (1 songs), shuffled";
         assertEquals(expected, playlist.toString());
     }
 
