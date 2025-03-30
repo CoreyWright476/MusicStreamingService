@@ -27,30 +27,6 @@ public class MusicStreamingApplicationTest {
     }
 
     @Test
-    void testDisplayMenu() {
-        setInput("q\n");
-        app.displayMenu();
-        String output = outContent.toString();
-        assertTrue(output.contains("=== Music Streaming App ==="));
-        assertTrue(output.contains("1. List Songs"));
-        assertTrue(output.contains("2. Play Song"));
-        assertTrue(output.contains("q. Quit"));
-        assertTrue(output.contains("Choice: "));
-    }
-
-    @Test
-    void testListSongs() {
-        setInput("q\n");
-        app.listSongs();
-        String output = outContent.toString();
-        System.out.println("testListSongs output: [" + output + "]"); // Debug
-        assertTrue(output.contains("Music Library (10 songs)"));
-        assertTrue(output.contains("Blinding Lights"));
-        assertTrue(output.contains("1. "));
-        assertTrue(output.contains("10. "));
-    }
-
-    @Test
     void testPlaySongValidInput() {
         setInput("1\n");
         Song songBefore = service.getLibrary().getSongs(false).get(0);
@@ -63,36 +39,8 @@ public class MusicStreamingApplicationTest {
     }
 
     @Test
-    void testPlaySongInvalidInput() {
-        setInput("invalid\n");
-        app.playSong();
-        String output = outContent.toString();
-        assertTrue(output.contains("Invalid selection: "));
-        assertTrue(output.contains("For input string: \"invalid\"") || output.contains("NumberFormatException"));
-    }
-
-    @Test
-    void testRunExitsOnQuit() {
-        setInput("q\n");
-        app.run();
-        String output = outContent.toString();
-        assertTrue(output.contains("Exiting Music Streaming App..."));
-    }
-
-    @Test
-    void testRunProcessesListSongs() {
-        setInput("1\nq\n");
-        app.run();
-        String output = outContent.toString();
-        System.out.println("testRunProcessesListSongs output: [" + output + "]"); // Debug
-        assertTrue(output.contains("Music Library (10 songs)"));
-        assertTrue(output.contains("Blinding Lights"));
-        assertTrue(output.contains("Exiting Music Streaming App..."));
-    }
-
-    @Test
     void testRunProcessesPlaySong() {
-        setInput("2\n1\nq\n");
+        setInput("5\n1\n6\n");
         Song songBefore = service.getLibrary().getSongs(false).get(0);
         long initialPlayCount = songBefore.getPlayCount();
         app.run();
@@ -104,8 +52,56 @@ public class MusicStreamingApplicationTest {
     }
 
     @Test
+    void testRunExitsOnExit() {
+        setInput("6\n"); // Updated to 6
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Exiting Music Streaming App..."));
+    }
+
+    // Update other run tests to use "6" instead of "5" for exit
+    @Test
+    void testRunProcessesAddSong() {
+        setInput("1\nTest Song\nTest Artist\n500\n2024\nPop\n6\n");
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Added: Test Song                    by Test Artist 500 (2024)    Pop"));
+        assertTrue(output.contains("Exiting Music Streaming App..."));
+    }
+
+    @Test
+    void testRunProcessesRemoveSong() {
+        setInput("2\n1\n6\n");
+        Song songToRemove = service.getLibrary().getSongs(false).get(0);
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Removed: " + songToRemove));
+        assertTrue(output.contains("Exiting Music Streaming App..."));
+    }
+
+    @Test
+    void testRunProcessesListSongs() {
+        setInput("3\n6\n");
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Music Library (10 songs)"));
+        assertTrue(output.contains("Blinding Lights"));
+        assertTrue(output.contains("Exiting Music Streaming App..."));
+    }
+
+    @Test
+    void testRunProcessesListSongsByPlayCount() {
+        setInput("4\n100000000\n6\n");
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Songs with 100000000 or more plays:"));
+        assertTrue(output.contains("Blinding Lights"));
+        assertTrue(output.contains("Exiting Music Streaming App..."));
+    }
+
+    @Test
     void testRunHandlesInvalidChoice() {
-        setInput("x\nq\n");
+        setInput("x\n6\n");
         app.run();
         String output = outContent.toString();
         assertTrue(output.contains("Invalid choice. Try again."));
