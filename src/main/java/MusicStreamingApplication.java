@@ -1,15 +1,31 @@
+import java.time.Year;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Console-based music streaming application emulating features of services like Spotify.
+ * Provides a menu-driven interface to manage songs, including adding, removing, listing,
+ * playing, and filtering by play count, with additional shuffle mode and playback history features.
+ */
 public class MusicStreamingApplication {
-    private final Scanner scanner;
-    private final MusicStreamingService service;
 
+    private final Scanner scanner; // Scanner for reading user input
+    private final MusicStreamingService service; // Service, handling song management
+    private static final String EXIT_OPTION = "8"; // Constant for the exit menu option
+
+    /**
+     * Constructs the application with a scanner and music streaming service.
+     * parameter scanner scans for the user input
+     * parameter service is responsible for managing the song library and playback
+     */
     public MusicStreamingApplication(Scanner scanner, MusicStreamingService service) {
         this.scanner = scanner;
         this.service = service;
     }
 
+    /**
+     * Entry point of the application. Initialises and runs the music streaming app.
+     */
     public static void main(String[] args) {
         MusicStreamingApplication app = new MusicStreamingApplication(
                 new Scanner(System.in), new MusicStreamingService()
@@ -17,12 +33,15 @@ public class MusicStreamingApplication {
         app.run();
     }
 
+    /**
+     * Runs the main application loop, displaying the menu and processing user choices until the user decides to exit.
+     */
     public void run() {
         service.initialiseDefaultSongs();
         while (true) {
             displayMenu();
             String choice = scanner.nextLine().trim();
-            if (choice.equals("8")) {
+            if (choice.equals(EXIT_OPTION)) {
                 System.out.println("Exiting Music Streaming App...");
                 break;
             }
@@ -31,6 +50,9 @@ public class MusicStreamingApplication {
         scanner.close();
     }
 
+    /**
+     * Displays the interactive menu with all available options, including shuffle the state, [OFF]/[ON].
+     */
     private void displayMenu() {
         System.out.println("\nMusic Streaming App Menu:");
         System.out.println("1. Add a new song");
@@ -44,6 +66,10 @@ public class MusicStreamingApplication {
         System.out.print("Choice: ");
     }
 
+    /**
+     * Processes the user's menu choice and delegates to the appropriate method.
+     * parameter 'choice' reflects The user's selected menu option
+     */
     private void processChoice(String choice) {
         switch (choice) {
             case "1": addNewSong(); break;
@@ -57,6 +83,9 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Lists all songs in the library with numbered indices for the users selection.
+     */
     private void listSongs() {
         System.out.println("\n" + service.getLibrary());
         int index = 1;
@@ -65,6 +94,9 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Adds a new song to the library, including basic error handling to ensure there is a valid title and artist input from the user.
+     */
     void addNewSong() {
         String title = "";
         while (title.isEmpty()) {
@@ -98,10 +130,10 @@ public class MusicStreamingApplication {
         int year;
         try {
             String yearInput = scanner.nextLine().trim();
-            year = yearInput.isEmpty() ? java.time.Year.now().getValue() : Integer.parseInt(yearInput);
+            year = yearInput.isEmpty() ? Year.now().getValue() : Integer.parseInt(yearInput);
         } catch (NumberFormatException e) {
             System.out.println("Invalid year. Using current year.");
-            year = java.time.Year.now().getValue();
+            year = Year.now().getValue();
         }
 
         System.out.print("Enter genre: ");
@@ -116,6 +148,9 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Removes a song from the library based on user-selected index.
+     */
     void removeSong() {
         listSongs();
         System.out.print("Enter song number to remove: ");
@@ -134,6 +169,9 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Lists songs with play counts exceeding a user-specified number.
+     */
     void listSongsByPlayCount() {
         System.out.print("Enter minimum play count: ");
         try {
@@ -151,6 +189,9 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Plays a song selected by the user, incrementing its play count by 1.
+     */
     void playSong() {
         listSongs();
         System.out.print("Enter song number to play: ");
@@ -163,11 +204,17 @@ public class MusicStreamingApplication {
         }
     }
 
+    /**
+     * Toggles shuffle mode for the song library.
+     */
     void toggleShuffle() {
         service.toggleShuffle();
         System.out.println("Shuffle mode is now " + (service.getLibrary().isShuffled() ? "ON" : "OFF"));
     }
 
+    /**
+     * Displays the last 5 played songs from playback history.
+     */
     void showPlaybackHistory() {
         System.out.println("\nPlayback History (last 5 songs):");
         List<Song> history = service.getPlaybackHistory();
