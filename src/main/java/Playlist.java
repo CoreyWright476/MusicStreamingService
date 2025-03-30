@@ -3,45 +3,44 @@ import java.util.Collections;
 import java.util.List;
 
 public class Playlist {
-
     private final String name;
     private final List<Song> songs;
     private boolean shuffle;
 
     public Playlist(String name) {
-
-        if(name == null || name.isEmpty()){
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Playlist name cannot be null or empty");
         }
         this.name = name;
-        this.songs = new ArrayList<Song>();
+        this.songs = new ArrayList<>();
         this.shuffle = false;
     }
 
     public void addSong(Song song) {
-        this.songs.add(song);
+        if (song != null && !songs.contains(song)) {
+            songs.add(song);
+        }
     }
 
-    public String getName() {
-        return name;
+    public void removeSong(Song song) {
+        songs.remove(song);
     }
 
-    public List<Song> getSongs(boolean shuffle) {
-        if(shuffle) {
+    public List<Song> getSongs(boolean applyShuffle) {
+        if (applyShuffle && shuffle) {
             List<Song> shuffled = new ArrayList<>(songs);
             Collections.shuffle(shuffled);
             return shuffled;
         }
-
-        return new ArrayList<>(songs);
-    }
-
-    public boolean isShuffle() {
-        return shuffle;
+        return new ArrayList<>(songs); // Return a copy to prevent external modification
     }
 
     public void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int size() {
@@ -50,7 +49,7 @@ public class Playlist {
 
     @Override
     public String toString() {
-        return name + " (" + songs.size() + " songs" + (shuffle ? ", shuffled" : "") + ")";
+        String base = name + " (" + songs.size() + " songs)";
+        return shuffle ? base + ", shuffled" : base;
     }
-
 }

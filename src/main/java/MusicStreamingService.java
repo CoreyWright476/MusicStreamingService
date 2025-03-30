@@ -25,8 +25,10 @@ public class MusicStreamingService {
             songLibrary.add(new Song("As It Was", "Harry Styles", 567890123, 2022, "Pop-Rock"));
             songLibrary.add(new Song("Anti-Hero", "Taylor Swift", 89123456, 2022, "Pop"));
             songLibrary.add(new Song("Heat Waves", "Glass Animals", 345678901, 2020, "Indie"));
-            library.getSongs(false).clear();
-            library.getSongs(false).addAll(songLibrary);
+            library.getSongs(false).clear(); // Clear any existing songs (should be empty)
+            library.getSongs(false).addAll(songLibrary); // This doesn’t work as intended
+            // Fix: Use addSong to populate library correctly
+            songLibrary.forEach(library::addSong);
             playlists.put("Favorites", new Playlist("Favorites"));
         }
     }
