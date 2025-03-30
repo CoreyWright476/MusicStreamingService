@@ -25,9 +25,6 @@ public class MusicStreamingService {
             songLibrary.add(new Song("As It Was", "Harry Styles", 567890123, 2022, "Pop-Rock"));
             songLibrary.add(new Song("Anti-Hero", "Taylor Swift", 89123456, 2022, "Pop"));
             songLibrary.add(new Song("Heat Waves", "Glass Animals", 345678901, 2020, "Indie"));
-            library.getSongs(false).clear(); // Clear any existing songs (should be empty)
-            library.getSongs(false).addAll(songLibrary); // This doesn’t work as intended
-            // Fix: Use addSong to populate library correctly
             songLibrary.forEach(library::addSong);
             playlists.put("Favorites", new Playlist("Favorites"));
         }
@@ -40,18 +37,14 @@ public class MusicStreamingService {
 
     public void removeSong(Song song) {
         songLibrary.remove(song);
-        playlists.values().forEach(p -> p.getSongs(false).remove(song));
-        library.getSongs(false).remove(song);
-    }
-
-    public Collection<Song> filterSongsByPlays(long minPlays) {
-        return songLibrary.stream()
-                .filter(s -> s.getPlayCount() >= minPlays)
-                .collect(Collectors.toList());
+        playlists.values().forEach(p -> p.removeSong(song));
+        library.removeSong(song);
     }
 
     public void playSong(Song song) {
-        song.incrementPlayCount();
+        if (songLibrary.contains(song)) {
+            song.incrementPlayCount();
+        }
     }
 
     public void playSong(int index) {
@@ -59,16 +52,10 @@ public class MusicStreamingService {
         song.incrementPlayCount();
     }
 
-    public int getSongLibrarySize() {
-        return songLibrary.size();
-    }
-
-    public int getPlaylistsSize() {
-        return playlists.size();
-    }
-
-    public boolean containsSong(Song song) {
-        return songLibrary.contains(song);
+    public Collection<Song> filterSongsByPlays(long minPlays) {
+        return songLibrary.stream()
+                .filter(s -> s.getPlayCount() >= minPlays)
+                .collect(Collectors.toList());
     }
 
     public Playlist getLibrary() {

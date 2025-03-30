@@ -1,12 +1,11 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MusicStreamingServiceTest {
-
     private MusicStreamingService app;
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
@@ -19,15 +18,15 @@ public class MusicStreamingServiceTest {
     @Test
     void testInitialiseDefaultSongs() {
         app.initialiseDefaultSongs();
-        assertEquals(10, app.getSongLibrarySize());
-        assertEquals(1, app.getPlaylistsSize());
+        assertEquals(10, app.getLibrary().size());
+        assertEquals(1, app.getPlaylists().size());
     }
 
     @Test
     void testAddSong() {
         Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
         app.addSong(song);
-        assertTrue(app.containsSong(song));
+        assertTrue(app.getLibrary().getSongs(false).contains(song));
     }
 
     @Test
@@ -35,7 +34,7 @@ public class MusicStreamingServiceTest {
         Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
         app.addSong(song);
         app.removeSong(song);
-        assertFalse(app.containsSong(song));
+        assertFalse(app.getLibrary().getSongs(false).contains(song));
     }
 
     @Test
