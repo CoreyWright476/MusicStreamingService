@@ -66,32 +66,54 @@ public class MusicStreamingApplication {
     }
 
     void addNewSong() {
-        System.out.print("Enter song title: ");
-        String title = scanner.nextLine().trim();
-        System.out.print("Enter artist: ");
-        String artist = scanner.nextLine().trim();
+        String title = "";
+        while (title.isEmpty()) {
+            System.out.print("Enter song title: ");
+            title = scanner.nextLine().trim();
+            if (title.isEmpty()) {
+                System.out.println("Title cannot be empty. Try again.");
+            }
+        }
+
+        String artist = "";
+        while (artist.isEmpty()) {
+            System.out.print("Enter artist: ");
+            artist = scanner.nextLine().trim();
+            if (artist.isEmpty()) {
+                System.out.println("Artist cannot be empty. Try again.");
+            }
+        }
+
         System.out.print("Enter play count: ");
         long playCount;
         try {
-            playCount = Long.parseLong(scanner.nextLine().trim());
+            String playCountInput = scanner.nextLine().trim();
+            playCount = playCountInput.isEmpty() ? 0 : Long.parseLong(playCountInput);
         } catch (NumberFormatException e) {
             System.out.println("Invalid play count. Using 0.");
             playCount = 0;
         }
+
         System.out.print("Enter year: ");
         int year;
         try {
-            year = Integer.parseInt(scanner.nextLine().trim());
+            String yearInput = scanner.nextLine().trim();
+            year = yearInput.isEmpty() ? java.time.Year.now().getValue() : Integer.parseInt(yearInput);
         } catch (NumberFormatException e) {
             System.out.println("Invalid year. Using current year.");
             year = java.time.Year.now().getValue();
         }
+
         System.out.print("Enter genre: ");
         String genre = scanner.nextLine().trim();
 
-        Song song = new Song(title, artist, playCount, year, genre);
-        service.addSong(song);
-        System.out.println("Added: " + song);
+        try {
+            Song song = new Song(title, artist, playCount, year, genre);
+            service.addSong(song);
+            System.out.println("Added: " + song);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to add song: " + e.getMessage());
+        }
     }
 
     void removeSong() {

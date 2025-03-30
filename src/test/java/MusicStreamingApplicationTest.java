@@ -25,7 +25,7 @@ public class MusicStreamingApplicationTest {
 
     @Test
     void testPlaySongValidInput() {
-        setInput("5\n1\n8\n"); // Updated exit to 8
+        setInput("5\n1\n8\n");
         service.initialiseDefaultSongs();
         Song songBefore = service.getLibrary().getSongs().get(0);
         long initialPlayCount = songBefore.getPlayCount();
@@ -42,13 +42,13 @@ public class MusicStreamingApplicationTest {
         app.run();
         String output = outContent.toString();
         assertTrue(output.contains("Playing: "));
-        assertTrue(output.contains("Midnight Rain")); // First default song
+        assertTrue(output.contains("Midnight Rain"));
         assertTrue(output.contains("Exiting Music Streaming App..."));
     }
 
     @Test
     void testRunExitsOnExit() {
-        setInput("8\n"); // Updated from 6 to 8
+        setInput("8\n");
         app.run();
         String output = outContent.toString();
         assertTrue(output.contains("Exiting Music Streaming App..."));
@@ -68,7 +68,7 @@ public class MusicStreamingApplicationTest {
         setInput("2\n1\n8\n");
         app.run();
         String output = outContent.toString();
-        assertTrue(output.contains("Removed: Midnight Rain")); // First default song
+        assertTrue(output.contains("Removed: Midnight Rain"));
         assertTrue(output.contains("Exiting Music Streaming App..."));
     }
 
@@ -101,7 +101,6 @@ public class MusicStreamingApplicationTest {
         assertTrue(output.contains("Exiting Music Streaming App..."));
     }
 
-    // New tests for shuffle and playback history
     @Test
     void testToggleShuffle() {
         setInput("6\n8\n");
@@ -118,5 +117,17 @@ public class MusicStreamingApplicationTest {
         assertTrue(output.contains("Playing: Midnight Rain"));
         assertTrue(output.contains("Playback History"));
         assertTrue(output.contains("Midnight Rain"));
+    }
+
+    @Test
+    void testAddSongWithEmptyFields() {
+        // Empty title, then valid title, empty artist, then valid artist
+        setInput("1\n\nValid Title\n\nValid Artist\n500\n2023\nPop\n8\n");
+        app.run();
+        String output = outContent.toString();
+        assertTrue(output.contains("Title cannot be empty. Try again."));
+        assertTrue(output.contains("Artist cannot be empty. Try again."));
+        assertTrue(output.contains("Added: Valid Title                  by Valid Artist 500 (2023)    Pop"));
+        assertTrue(output.contains("Exiting Music Streaming App..."));
     }
 }
