@@ -10,12 +10,11 @@ public class SongTest {
 
     @BeforeEach
     void setup() {
-        //placeholder for setup implementation
+        song = new Song("Test Song", "Test Artist", 0, 2023, "Pop");
     }
 
     @Test
     void testSongCreation(){
-        song = new Song("Test Song", "Test Artist", 0, 2023, "Pop");
         assertEquals("Test Song", song.getTitle());
         assertEquals("Test Artist", song.getArtist());
         assertEquals(0, song.getPlayCount());
@@ -37,15 +36,13 @@ public class SongTest {
 
     @Test
     void testIncrementPlayCount() {
-        song = new Song("Test Song", "Test Artist", 0, 2023, "Pop");
         song.incrementPlayCount();
         assertEquals(1, song.getPlayCount());
     }
 
     @Test
     void testToStringFormat() {
-        song = new Song("Test Song", "Test Artist", 1000, 2023, "Pop");
-        String expected = "Test Song                    by Test Artist 1000 (2023)    Pop";
+        String expected = "Test Song                    by Test Artist 0 (2023)    Pop";
         assertEquals(expected, song.toString());
     }
 

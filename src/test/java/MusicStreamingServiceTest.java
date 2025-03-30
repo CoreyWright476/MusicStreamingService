@@ -1,20 +1,18 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class MusicStreamingServiceTest {
 
-public class MusicStreamingApplicationTest {
-
-    private MusicStreamingApplication app;
+    private MusicStreamingService app;
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     @BeforeEach
-    public void setUp() {
-        app = new MusicStreamingApplication();
+    void setUp() {
+        app = new MusicStreamingService();
         System.setOut(new PrintStream(outContent));
     }
 
@@ -26,8 +24,15 @@ public class MusicStreamingApplicationTest {
     }
 
     @Test
+    void testAddSong() {
+        Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
+        app.addSong(song);
+        assertTrue(app.containsSong(song));
+    }
+
+    @Test
     void testRemoveSong() {
-        Song song = new Song("New Song", "New Artist", 0, 2024, "Pop");
+        Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
         app.addSong(song);
         app.removeSong(song);
         assertFalse(app.containsSong(song));
@@ -43,10 +48,9 @@ public class MusicStreamingApplicationTest {
 
     @Test
     void testPlaySong() {
-        Song song = new Song("New Song", "New Artist", 0, 2024, "Pop");
+        Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
         app.addSong(song);
         app.playSong(song);
         assertEquals(1, song.getPlayCount());
     }
-
 }

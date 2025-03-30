@@ -1,12 +1,17 @@
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MusicStreamingApplication {
+public class MusicStreamingService {
+    private final Playlist library;
+    private final Set<Song> songLibrary;
+    private final Map<String, Playlist> playlists;
 
-    private final Set<Song> songLibrary = new TreeSet<>(Comparator.comparing(Song::getTitle)
-            .thenComparing(Song::getArtist).thenComparing(Song::getYear));
-
-    private final Map<String, Playlist> playlists = new TreeMap<>();
+    public MusicStreamingService() {
+        this.library = new Playlist("Music Library");
+        this.songLibrary = new TreeSet<>(Comparator.comparing(Song::getTitle)
+                .thenComparing(Song::getArtist).thenComparing(Song::getYear));
+        this.playlists = new TreeMap<>();
+    }
 
     public void initialiseDefaultSongs() {
         if (songLibrary.isEmpty()) {
@@ -20,17 +25,21 @@ public class MusicStreamingApplication {
             songLibrary.add(new Song("As It Was", "Harry Styles", 567890123, 2022, "Pop-Rock"));
             songLibrary.add(new Song("Anti-Hero", "Taylor Swift", 89123456, 2022, "Pop"));
             songLibrary.add(new Song("Heat Waves", "Glass Animals", 345678901, 2020, "Indie"));
+            library.getSongs(false).clear();
+            library.getSongs(false).addAll(songLibrary);
             playlists.put("Favorites", new Playlist("Favorites"));
         }
     }
 
     public void addSong(Song song) {
         songLibrary.add(song);
+        library.addSong(song);
     }
 
     public void removeSong(Song song) {
         songLibrary.remove(song);
         playlists.values().forEach(p -> p.getSongs(false).remove(song));
+        library.getSongs(false).remove(song);
     }
 
     public Collection<Song> filterSongsByPlays(long minPlays) {
@@ -40,14 +49,31 @@ public class MusicStreamingApplication {
     }
 
     public void playSong(Song song) {
-        if (songLibrary.contains(song)) {
-            song.incrementPlayCount();
-            System.out.println("Now playing: " + song);
-        }
+        song.incrementPlayCount();
     }
 
-    // Testable helper methods
-    public int getSongLibrarySize() { return songLibrary.size(); }
-    public int getPlaylistsSize() { return playlists.size(); }
-    public boolean containsSong(Song song) { return songLibrary.contains(song); }
+    public void playSong(int index) {
+        Song song = library.getSongs(false).get(index);
+        song.incrementPlayCount();
+    }
+
+    public int getSongLibrarySize() {
+        return songLibrary.size();
+    }
+
+    public int getPlaylistsSize() {
+        return playlists.size();
+    }
+
+    public boolean containsSong(Song song) {
+        return songLibrary.contains(song);
+    }
+
+    public Playlist getLibrary() {
+        return library;
+    }
+
+    public Map<String, Playlist> getPlaylists() {
+        return playlists;
+    }
 }
