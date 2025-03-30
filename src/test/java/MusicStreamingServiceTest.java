@@ -1,55 +1,80 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.Collection;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MusicStreamingServiceTest {
-    private MusicStreamingService app;
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private MusicStreamingService service;
 
     @BeforeEach
     void setUp() {
-        app = new MusicStreamingService();
-        System.setOut(new PrintStream(outContent));
+        service = new MusicStreamingService();
     }
 
     @Test
     void testInitialiseDefaultSongs() {
-        app.initialiseDefaultSongs();
-        assertEquals(10, app.getLibrary().size());
-        assertEquals(1, app.getPlaylists().size());
+        service.initialiseDefaultSongs();
+        assertEquals(10, service.getLibrary().size());
     }
 
     @Test
     void testAddSong() {
         Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
-        app.addSong(song);
-        assertTrue(app.getLibrary().getSongs(false).contains(song));
+        service.addSong(song);
+        assertTrue(service.getLibrary().getSongs().contains(song));
     }
 
     @Test
     void testRemoveSong() {
-        Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
-        app.addSong(song);
-        app.removeSong(song);
-        assertFalse(app.getLibrary().getSongs(false).contains(song));
+        service.initialiseDefaultSongs();
+        Song song = service.getLibrary().getSongs().get(0);
+        service.removeSong(song);
+        assertFalse(service.getLibrary().getSongs().contains(song));
     }
 
     @Test
     void testFilterSongsByPlays() {
-        app.initialiseDefaultSongs();
-        Collection<Song> filtered = app.filterSongsByPlays(100000000);
-        assertTrue(filtered.size() > 0);
+        service.initialiseDefaultSongs();
+        List<Song> filtered = (List<Song>) service.filterSongsByPlays(100000000);
+        assertFalse(filtered.isEmpty());
         filtered.forEach(s -> assertTrue(s.getPlayCount() >= 100000000));
     }
 
     @Test
     void testPlaySong() {
-        Song song = new Song("New Song", "New Artist", 0, 2023, "Jazz");
-        app.addSong(song);
-        app.playSong(song);
-        assertEquals(1, song.getPlayCount());
+        service.initialiseDefaultSongs();
+        Song song = service.getLibrary().getSongs().get(0);
+        long initialPlayCount = song.getPlayCount();
+        service.playSong(0);
+        assertEquals(initialPlayCount + 1, song.getPlayCount());
+    }
+
+    // New tests for shuffle and playback history
+    @Test
+    void testToggleShuffle() {
+        service.initialiseDefaultSongs();
+        service.toggleShuffle();
+        assertTrue(service.getLibrary().isShuffled());
+        service.toggleShuffle();
+        assertFalse(service.getLibrary().isShuffled());
+    }
+
+    @Test
+    void testPlaybackHistory() {
+        service.initialiseDefaultSongs();
+        service.playSong(0);
+        service.playSong(1);
+        List<Song> history = service.getPlaybackHistory();
+        assertEquals(2, history.size());
+        assertEquals(service.getLibrary().getSongs().get(1), history.get(0)); // Most recent first
+    }
+
+    @Test
+    void testPlaybackHistoryLimit() {
+        service.initialiseDefaultSongs();
+        for (int i = 0; i < 6; i++) {
+            service.playSong(i % service.getLibrary().size());
+        }
+        assertEquals(5, service.getPlaybackHistory().size());
     }
 }

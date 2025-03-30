@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class MusicStreamingApplication {
@@ -21,35 +22,13 @@ public class MusicStreamingApplication {
         while (true) {
             displayMenu();
             String choice = scanner.nextLine().trim();
-            if (choice.equals("6")) { // Updated to 6 since 5 is exit
+            if (choice.equals("8")) {
                 System.out.println("Exiting Music Streaming App...");
                 break;
             }
             processChoice(choice);
         }
         scanner.close();
-    }
-
-    private void processChoice(String choice) {
-        switch (choice) {
-            case "1":
-                addNewSong();
-                break;
-            case "2":
-                removeSong();
-                break;
-            case "3":
-                listSongs();
-                break;
-            case "4":
-                listSongsByPlayCount();
-                break;
-            case "5":
-                playSong();
-                break;
-            default:
-                System.out.println("Invalid choice. Try again.");
-        }
     }
 
     private void displayMenu() {
@@ -59,14 +38,29 @@ public class MusicStreamingApplication {
         System.out.println("3. List all songs");
         System.out.println("4. List songs over specific play count");
         System.out.println("5. Play a song");
-        System.out.println("6. Exit");
+        System.out.println("6. Toggle shuffle (" + (service.getLibrary().isShuffled() ? "ON" : "OFF") + ")");
+        System.out.println("7. Show playback history");
+        System.out.println("8. Exit");
         System.out.print("Choice: ");
+    }
+
+    private void processChoice(String choice) {
+        switch (choice) {
+            case "1": addNewSong(); break;
+            case "2": removeSong(); break;
+            case "3": listSongs(); break;
+            case "4": listSongsByPlayCount(); break;
+            case "5": playSong(); break;
+            case "6": toggleShuffle(); break;
+            case "7": showPlaybackHistory(); break;
+            default: System.out.println("Invalid choice. Try again.");
+        }
     }
 
     private void listSongs() {
         System.out.println("\n" + service.getLibrary());
         int index = 1;
-        for (Song song : service.getLibrary().getSongs(false)) {
+        for (Song song : service.getLibrary().getSongs()) {
             System.out.println(index++ + ". " + song);
         }
     }
@@ -105,11 +99,16 @@ public class MusicStreamingApplication {
         System.out.print("Enter song number to remove: ");
         try {
             int index = Integer.parseInt(scanner.nextLine().trim()) - 1;
-            Song song = service.getLibrary().getSongs(false).get(index);
-            service.removeSong(song);
-            System.out.println("Removed: " + song);
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            System.out.println("Invalid selection: " + e.getMessage());
+            List<Song> songs = service.getLibrary().getSongs();
+            if (index >= 0 && index < songs.size()) {
+                Song song = songs.get(index);
+                service.removeSong(song);
+                System.out.println("Removed: " + song);
+            } else {
+                System.out.println("Invalid song number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
         }
     }
 
@@ -136,9 +135,27 @@ public class MusicStreamingApplication {
         try {
             int index = Integer.parseInt(scanner.nextLine().trim()) - 1;
             service.playSong(index);
-            System.out.println("Playing: " + service.getLibrary().getSongs(false).get(index));
+            System.out.println("Playing: " + service.getLibrary().getSongs().get(index));
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             System.out.println("Invalid selection: " + e.getMessage());
+        }
+    }
+
+    void toggleShuffle() {
+        service.toggleShuffle();
+        System.out.println("Shuffle mode is now " + (service.getLibrary().isShuffled() ? "ON" : "OFF"));
+    }
+
+    void showPlaybackHistory() {
+        System.out.println("\nPlayback History (last 5 songs):");
+        List<Song> history = service.getPlaybackHistory();
+        if (history.isEmpty()) {
+            System.out.println("No songs played yet.");
+        } else {
+            int index = 1;
+            for (Song song : history) {
+                System.out.println(index++ + ". " + song);
+            }
         }
     }
 }

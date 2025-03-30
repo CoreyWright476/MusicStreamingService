@@ -6,6 +6,7 @@ public class Playlist {
     private final String name;
     private final List<Song> songs;
     private boolean shuffle;
+    private List<Song> currentSongs; // Reflects the current song order (shuffled or not)
 
     public Playlist(String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -14,29 +15,35 @@ public class Playlist {
         this.name = name;
         this.songs = new ArrayList<>();
         this.shuffle = false;
+        this.currentSongs = new ArrayList<>(songs);
     }
 
     public void addSong(Song song) {
         if (song != null && !songs.contains(song)) {
             songs.add(song);
+            updateCurrentSongs();
         }
     }
 
     public void removeSong(Song song) {
-        songs.remove(song);
+        if (songs.remove(song)) {
+            updateCurrentSongs();
+        }
     }
 
-    public List<Song> getSongs(boolean applyShuffle) {
-        if (applyShuffle && shuffle) {
-            List<Song> shuffled = new ArrayList<>(songs);
-            Collections.shuffle(shuffled);
-            return shuffled;
-        }
-        return new ArrayList<>(songs); // Return a copy to prevent external modification
+    public List<Song> getSongs() {
+        return new ArrayList<>(currentSongs);
     }
 
     public void setShuffle(boolean shuffle) {
-        this.shuffle = shuffle;
+        if (this.shuffle != shuffle) {
+            this.shuffle = shuffle;
+            updateCurrentSongs();
+        }
+    }
+
+    public boolean isShuffled() {
+        return shuffle;
     }
 
     public String getName() {
@@ -45,6 +52,13 @@ public class Playlist {
 
     public int size() {
         return songs.size();
+    }
+
+    private void updateCurrentSongs() {
+        currentSongs = new ArrayList<>(songs);
+        if (shuffle) {
+            Collections.shuffle(currentSongs);
+        }
     }
 
     @Override

@@ -1,19 +1,17 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlaylistTest {
-
     private Playlist playlist;
-    private Song song;
+    private Song song1;
+    private Song song2;
 
     @BeforeEach
     public void setUp() {
         playlist = new Playlist("Test Playlist");
-        song = new Song("Test Song", "Test artist", 0, 2023, "Pop");
+        song1 = new Song("Test Song", "Test Artist", 0, 2023, "Pop");
+        song2 = new Song("Another Song", "Another Artist", 0, 2022, "Rock");
     }
 
     @Test
@@ -29,31 +27,44 @@ public class PlaylistTest {
 
     @Test
     void testAddSong() {
-        playlist.addSong(song);
+        playlist.addSong(song1);
         assertEquals(1, playlist.size());
-        assertTrue(playlist.getSongs(false).contains(song));
+        assertTrue(playlist.getSongs().contains(song1));
     }
 
     @Test
-    void testShuffle() {
-        Song song2 = new Song("Test Song 2", "Test artist 2", 0, 2023, "Rock");
-        playlist.addSong(song);
+    void testAddDuplicateSong() {
+        playlist.addSong(song1);
+        playlist.addSong(song1);
+        assertEquals(1, playlist.size());
+    }
+
+    @Test
+    void testRemoveSong() {
+        playlist.addSong(song1);
+        playlist.removeSong(song1);
+        assertEquals(0, playlist.size());
+        assertFalse(playlist.getSongs().contains(song1));
+    }
+
+    // New tests for shuffle
+    @Test
+    void testSetShuffle() {
+        playlist.addSong(song1);
         playlist.addSong(song2);
         playlist.setShuffle(true);
-        List<Song> unshuffled = playlist.getSongs(false);
-        List<Song> shuffled = playlist.getSongs(true);
-        assertEquals(2, unshuffled.size());
-        assertTrue(shuffled.contains(song) && shuffled.contains(song2));
+        assertTrue(playlist.isShuffled());
+        assertEquals(2, playlist.getSongs().size());
+        playlist.setShuffle(false);
+        assertFalse(playlist.isShuffled());
+        assertEquals(song1, playlist.getSongs().get(0)); // Order preserved
     }
 
     @Test
-    void testToString() {
-        playlist.addSong(song);
-        String expected = "Test Playlist (1 songs)";
-        assertEquals(expected, playlist.toString());
+    void testToStringWithShuffle() {
+        playlist.addSong(song1);
+        assertEquals("Test Playlist (1 songs)", playlist.toString());
         playlist.setShuffle(true);
-        expected = "Test Playlist (1 songs), shuffled";
-        assertEquals(expected, playlist.toString());
+        assertEquals("Test Playlist (1 songs), shuffled", playlist.toString());
     }
-
 }
