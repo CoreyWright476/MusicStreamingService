@@ -39,7 +39,7 @@ public class PlaylistTest {
         Song song2 = new Song("Test Song 2", "Test artist 2", 0, 2023, "Rock");
         playlist.addSong(song);
         playlist.addSong(song2);
-        playlist.getShuffle(true);
+        playlist.setShuffle(true);
         List<Song> unshuffled = playlist.getSongs(false);
         List<Song> shuffled = playlist.getSongs(true);
         assertEquals(2, unshuffled.size());
@@ -49,11 +49,11 @@ public class PlaylistTest {
     @Test
     void testToString() {
         playlist.addSong(song);
-        String expected = "Test Playlist (1 song)";
-        assertEquals(expected, playlist.toString);
+        String expected = "Test Playlist (1 songs)";
+        assertEquals(expected, playlist.toString());
         playlist.setShuffle(true);
-        expected = "Test playlist(1 song, shuffled)";
-        assertEquals(expected, playlist.toString);
+        expected = "Test Playlist (1 songs, shuffled)";
+        assertEquals(expected, playlist.toString());
     }
 
 }
