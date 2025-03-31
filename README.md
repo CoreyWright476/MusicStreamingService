@@ -7,5 +7,4 @@ If using an IDE such as intellij you can head to the MusicStreamingApplication a
 
 Or use the following command:
 
-./gradlew build
 java -cp build/classes/java/main MusicStreamingApplication
